@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class playerMovement : MonoBehaviour
 {
     //Variables
-    public float moveSpeed = 5f;
+    public float treadForce = 5f;
     public Rigidbody2D rigidBody;
     public GameObject seaLineObject; // should be a thin object with a boxCollider2D component and trigger enabled
                                      // that signifies the sea line
@@ -26,6 +26,9 @@ public class playerMovement : MonoBehaviour
 
     private bool canBreath = true;
 
+    public float swimDelay = 1.0f;
+    private float swimTimer = 0.0f;
+
     // Update is called once per frame
     void Update()
     {
@@ -43,9 +46,10 @@ public class playerMovement : MonoBehaviour
         }
 
         if (oxygen <= 0.0f)
-        {
             Debug.Log("monke painfully drowned :(");
-        }
+
+        if (swimTimer >= 0.0f)
+            swimTimer -= Time.deltaTime;
     }
 
     void FixedUpdate()
@@ -63,7 +67,7 @@ public class playerMovement : MonoBehaviour
 
     void Move()
     {
-        //rb.velocity = new Vector2(movement.x * moveSpeed, movement.y * moveSpeed);
+        //rb.velocity = new Vector2(movement.x * treadForce, movement.y * treadForce);
         Vector2 v = new Vector2(movement.x, movement.y);
 
         if (canMoveUp)
@@ -71,7 +75,11 @@ public class playerMovement : MonoBehaviour
         else
             v = new Vector2(movement.x, 0);
 
-        rigidBody.AddForce(v.normalized * moveSpeed);
+        if (swimTimer <= 0.0f)
+        {
+            rigidBody.AddForce(v.normalized * treadForce);
+            swimTimer = swimDelay;
+        }
     }
 
     void OnTriggerExit2D(Collider2D other)
