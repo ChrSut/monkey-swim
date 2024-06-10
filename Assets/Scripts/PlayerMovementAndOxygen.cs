@@ -8,6 +8,7 @@ public class playerMovement : MonoBehaviour
 {
     //Variables
     public float treadForce = 5f;
+    public float moveSpeed = 2f;
     public Rigidbody2D rigidBody;
     public GameObject seaLineObject; // should be a thin object with a boxCollider2D component and trigger enabled
                                      // that signifies the sea line
@@ -80,6 +81,8 @@ public class playerMovement : MonoBehaviour
             rigidBody.AddForce(v.normalized * treadForce);
             swimTimer = swimDelay;
         }
+
+        rigidBody.AddForce(v.normalized * moveSpeed);
     }
 
     void OnTriggerExit2D(Collider2D other)
