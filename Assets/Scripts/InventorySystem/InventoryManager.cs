@@ -84,6 +84,78 @@ public class InventoryManager : MonoBehaviour
     }
 
     /// <summary>
+    /// Returns all the items and quantities currently in the inventory.
+    /// </summary>
+    /// <returns>A dictionary containing all the items (as keys) and their quantities (as values).</returns>
+    public Dictionary<Item, int> GetAllItems()
+    {
+        Dictionary<Item, int> items = new();
+
+        foreach (InventorySlotHolder child in slots)
+        {
+            if (child.transform.childCount != 0)
+            {
+                InventoryItem inventoryItem = child.transform.GetChild(0).GetComponent<InventoryItem>();
+
+                if (items.ContainsKey(inventoryItem.storedItem))
+                {
+                    items[inventoryItem.storedItem] += inventoryItem.currentStackSize;
+                }
+                else
+                {
+                    items.Add(inventoryItem.storedItem, inventoryItem.currentStackSize);
+                }
+            }
+        }
+
+        return items;
+    }
+
+    /// <summary>
+    /// Returns the total number of Items that can fit into the remaining slots.
+    /// </summary>
+    /// <param name="item">The Item to check for spaces.</param>
+    /// <returns>An integer specifying the total number of Item that can fit into the unfilled slots.</returns>
+    public int GetTotalEmptySlots(Item item)
+    {
+        int total = 0;
+
+        foreach (InventorySlotHolder child in slots)
+        {
+            if (child.transform.childCount == 1)
+            {
+                if (child.transform.GetChild(0).GetComponent<InventoryItem>().storedItem == item)
+                {
+                    total += item.maxStackSize - child.transform.GetChild(0).GetComponent<InventoryItem>().currentStackSize;
+                }
+            }
+        }
+
+        total += GetTotalEmptySlots() * item.maxStackSize;
+
+        return total;
+    }
+
+    /// <summary>
+    /// Returns the total number of empty slots
+    /// </summary>
+    /// <returns>An integer specifying the total number of completely empty slots in the player's inventory.</returns>
+    public int GetTotalEmptySlots()
+    {
+        int total = 0;
+
+        foreach (InventorySlotHolder child in slots)
+        {
+            if (child.transform.childCount == 0)
+            {
+                total++;
+            }
+        }
+
+        return total;
+    }
+
+    /// <summary>
     /// Changes the selected slot to the given slot position. This doesn't deselect the previous slot.
     /// </summary>
     /// <param name="slotPosition">An integer that specifies the slot position to select. Works for the hotbar only.</param>
@@ -187,7 +259,7 @@ public class InventoryManager : MonoBehaviour
                         if (inventoryItem.storedItem.itemID == item.itemID &&
                             inventoryItem.currentStackSize < item.maxStackSize)
                         {
-                            // Spawn the item into the slot
+                            // Add the item into the slot
                             IncrementItem(child);
                             quantity--;
                             break;
