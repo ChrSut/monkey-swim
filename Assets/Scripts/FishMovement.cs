@@ -10,7 +10,7 @@ public class fishMovement : MonoBehaviour
     public Rigidbody2D rb;
     private float theta = 0f;
     private float thetaStep = Mathf.PI / 32f;
-    public Rigidbody2D rigidBody;
+    // public Rigidbody2D rigidBody;
     Vector2 movement;
     public bool following = false;
     public float distance;
@@ -18,7 +18,6 @@ public class fishMovement : MonoBehaviour
     public HealthBar playerHealth;
     public int damage;
     private int attackCounter = 0;
-    public GameObject seaLineObject;
 
     void Start()
     {
@@ -38,7 +37,7 @@ public class fishMovement : MonoBehaviour
     {
         distance = Vector2.Distance(transform.position, player.transform.position);
         //Movement
-        rigidBody.MovePosition(rigidBody.position + movement*moveSpeed*Time.fixedDeltaTime);
+        rb.MovePosition(rb.position + movement*moveSpeed*Time.fixedDeltaTime);
 
         if (following && attackCounter >= 10)
         {
@@ -87,15 +86,6 @@ public class fishMovement : MonoBehaviour
             playerHealth.TakeDamage(damage);
             following = false;
             attackCounter = 0;
-        }
-    }
-
-    void OnTriggerStay2D(Collider2D other) { // not working correctly
-        if (other.name == seaLineObject.name) {
-            if (transform.position.y >= other.transform.position.y + 100)
-            {
-                movement.y *= movement.y;
-            }
         }
     }
 
